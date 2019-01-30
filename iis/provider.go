@@ -3,7 +3,7 @@ package iis
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	iis "github.com/maxjoehnk/microsoft-iis-administration"
+	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
 func Provider() terraform.ResourceProvider {

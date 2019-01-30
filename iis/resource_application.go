@@ -2,7 +2,7 @@ package iis
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
-	iis "github.com/maxjoehnk/microsoft-iis-administration"
+	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
 const PathKey = "path"

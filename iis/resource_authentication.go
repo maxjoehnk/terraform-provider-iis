@@ -2,7 +2,7 @@ package iis
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
-	iis "github.com/maxjoehnk/microsoft-iis-administration"
+	"github.com/maxjoehnk/microsoft-iis-administration"
 	"log"
 )
 
@@ -127,70 +127,67 @@ func resourceAuthenticationDelete(d *schema.ResourceData, m interface{}) error {
 }
 
 func updateAuthProviders(d *schema.ResourceData, client *iis.Client, auth iis.Authentication) error {
-	if err := updateAnonymousAuthentication(d, client, auth); err != nil {
+	anonymousAuthProvider := buildAnonymousAuthProvider(client, &auth)
+	basicAuthProvider := buildBasicAuthProvider(client, &auth)
+	windowsAuthProvider := buildWindowsAuthProvider(client, &auth)
+
+	if err := updateAuthenticationProvider(d, client, "anonymous", anonymousAuthProvider, updateAnonymousAuthentication); err != nil {
 		return err
 	}
-	if err := updateBasicAuthentication(d, client, auth); err != nil {
+	if err := updateAuthenticationProvider(d, client, "basic", basicAuthProvider, updateBasicAuthentication); err != nil {
 		return err
 	}
-	if err := updateWindowsAuthentication(d, client, auth); err != nil {
+	if err := updateAuthenticationProvider(d, client, "windows", windowsAuthProvider, updateWindowsAuthentication); err != nil {
 		return err
 	}
 	return nil
 }
 
-func updateAnonymousAuthentication(d *schema.ResourceData, client *iis.Client, auth iis.Authentication) error {
-	if !d.HasChange("anonymous") {
-		log.Println("no changes for anonymous authentication")
-		return nil
-	}
-	anonymous, err := client.ReadAnonymousAuthentication(&auth)
-	if err != nil {
-		return err
-	}
-	anonymousMap := getNestedMap(d, "anonymous")
-	anonymous.Enabled = anonymousMap["enabled"].(bool)
-	anonymous.User = anonymousMap["user"].(string)
+func updateAnonymousAuthentication(client *iis.Client, auth interface{}, data map[string]interface{}) error {
+	anonymous := auth.(iis.AnonymousAuthentication)
+	anonymous.Enabled = data["enabled"].(bool)
+	anonymous.User = data["user"].(string)
 
-	_, err = client.UpdateAnonymousAuthentication(&anonymous)
+	_, err := client.UpdateAnonymousAuthentication(&anonymous)
 
 	return err
 }
 
-func updateBasicAuthentication(d *schema.ResourceData, client *iis.Client, auth iis.Authentication) error {
-	if !d.HasChange("basic") {
-		log.Println("no changes for basic authentication")
-		return nil
-	}
-	basic, err := client.ReadBasicAuthentication(&auth)
-	if err != nil {
-		return err
-	}
-	basicMap := getNestedMap(d, "basic")
-	basic.Enabled = basicMap["enabled"].(bool)
-	basic.DefaultLogonDomain = basicMap["default_domain"].(string)
-	basic.Realm = basicMap["realm"].(string)
+func updateBasicAuthentication(client *iis.Client, auth interface{}, data map[string]interface{}) error {
+	basic := auth.(iis.BasicAuthentication)
+	basic.Enabled = data["enabled"].(bool)
+	basic.DefaultLogonDomain = data["default_domain"].(string)
+	basic.Realm = data["realm"].(string)
 
-	_, err = client.UpdateBasicAuthentication(&basic)
+	_, err := client.UpdateBasicAuthentication(&basic)
 
 	return err
 }
 
-func updateWindowsAuthentication(d *schema.ResourceData, client *iis.Client, auth iis.Authentication) error {
-	if !d.HasChange("windows") {
-		log.Println("no changes for windows authentication")
+func updateWindowsAuthentication(client *iis.Client, auth interface{}, data map[string]interface{}) error {
+	windows := auth.(iis.WindowsAuthentication)
+	windows.Enabled = data["enabled"].(bool)
+
+	_, err := client.UpdateWindowsAuthentication(&windows)
+
+	return err
+}
+
+func updateAuthenticationProvider(d *schema.ResourceData, client *iis.Client, key string, fetch FetchAuthProvider, update UpdateAuthProvider) error {
+	if !d.HasChange(key) {
+		log.Printf("no changes for %s authentication", key)
 		return nil
 	}
-	windows, err := client.ReadWindowsAuthentication(&auth)
+	provider, err := fetch()
 	if err != nil {
 		return err
 	}
-	windowsMap := getNestedMap(d, "windows")
-	windows.Enabled = windowsMap["enabled"].(bool)
 
-	_, err = client.UpdateWindowsAuthentication(&windows)
+	if !hasNestedMap(d, key) {
+		return nil
+	}
 
-	return err
+	return update(client, provider, getNestedMap(d, key))
 }
 
 func buildAnonymousAuthProvider(client *iis.Client, auth *iis.Authentication) FetchAuthProvider {
@@ -215,6 +212,8 @@ type AuthProvider interface {
 	ToMap() map[string]interface{}
 }
 type FetchAuthProvider func() (AuthProvider, error)
+
+type UpdateAuthProvider func(*iis.Client, interface{}, map[string]interface{}) error
 
 func readAuthenticationProvider(d *schema.ResourceData, key string, fetch FetchAuthProvider) error {
 	provider, err := fetch()

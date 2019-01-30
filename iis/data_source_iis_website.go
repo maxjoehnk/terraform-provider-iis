@@ -3,7 +3,7 @@ package iis
 import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
-	iis "github.com/maxjoehnk/microsoft-iis-administration"
+	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
 func dataSourceIisWebsite() *schema.Resource {
