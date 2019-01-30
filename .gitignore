@@ -1,0 +1,8 @@
+*.log
+*.tfstate
+*.tfstate.backup
+.terraform
+*.tfvars
+terraform-provider-iis
+.idea
+*.iml
