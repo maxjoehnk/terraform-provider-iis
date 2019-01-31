@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/maxjoehnk/microsoft-iis-administration"
 	"log"
+	"strings"
 )
 
 func resourceAuthentication() *schema.Resource {
@@ -69,7 +70,7 @@ func resourceAuthentication() *schema.Resource {
 							Optional: true,
 						},
 						"providers": {
-							Type:     schema.TypeSet,
+							Type:     schema.TypeList,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Optional: true,
 						},
@@ -165,8 +166,18 @@ func updateBasicAuthentication(client *iis.Client, auth interface{}, data map[st
 }
 
 func updateWindowsAuthentication(client *iis.Client, auth interface{}, data map[string]interface{}) error {
+	enabledProviders := data["providers"].([]interface{})
 	windows := auth.(iis.WindowsAuthentication)
 	windows.Enabled = data["enabled"].(bool)
+	for i, provider := range windows.Providers {
+		windows.Providers[i].Enabled = false
+		for _, name := range enabledProviders {
+			if strings.EqualFold(provider.Name, name.(string)) {
+				windows.Providers[i].Enabled = true
+				break
+			}
+		}
+	}
 
 	_, err := client.UpdateWindowsAuthentication(&windows)
 
