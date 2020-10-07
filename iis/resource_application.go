@@ -1,7 +1,9 @@
 package iis
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
@@ -12,10 +14,10 @@ const ApplicationPoolKey = "application_pool"
 
 func resourceApplication() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceApplicationCreate,
-		Read:   resourceApplicationRead,
-		Update: resourceApplicationUpdate,
-		Delete: resourceApplicationDelete,
+		CreateContext: resourceApplicationCreate,
+		ReadContext:   resourceApplicationRead,
+		UpdateContext: resourceApplicationUpdate,
+		DeleteContext: resourceApplicationDelete,
 
 		Schema: map[string]*schema.Schema{
 			PathKey: {
@@ -42,46 +44,46 @@ func resourceApplication() *schema.Resource {
 	}
 }
 
-func resourceApplicationCreate(d *schema.ResourceData, m interface{}) error {
+func resourceApplicationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	request := createApplicationRequest(d)
-	application, err := client.CreateApplication(request)
+	application, err := client.CreateApplication(ctx, request)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(application.ID)
 	return nil
 }
 
-func resourceApplicationRead(d *schema.ResourceData, m interface{}) error {
+func resourceApplicationRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
-	application, err := client.ReadApplication(d.Id())
+	application, err := client.ReadApplication(ctx, d.Id())
 	if err != nil {
 		d.SetId("")
-		return err
+		return diag.FromErr(err)
 	}
 	if err = d.Set(WebsiteKey, application.Website.ID); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err = d.Set(ApplicationPoolKey, application.ApplicationPool.ID); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err = d.Set("location", application.Location); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }
 
-func resourceApplicationUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceApplicationUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	return nil
 }
 
-func resourceApplicationDelete(d *schema.ResourceData, m interface{}) error {
+func resourceApplicationDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	id := d.Id()
-	err := client.DeleteApplication(id)
+	err := client.DeleteApplication(ctx, id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }

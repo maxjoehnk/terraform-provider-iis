@@ -1,6 +1,6 @@
 package iis
 
-import "github.com/hashicorp/terraform/helper/schema"
+import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 func getList(d *schema.ResourceData, key string) []interface{} {
 	return d.Get(key).([]interface{})
