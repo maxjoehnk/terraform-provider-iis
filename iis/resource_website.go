@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
 const nameKey = "name"
@@ -141,7 +140,7 @@ func getBindings(b *schema.Set) []iis.WebsiteBinding {
 	for i, entry := range b.List() {
 		binding := entry.(map[string]interface{})
 		protocol := binding[bindingProtocolKey].(string)
-		port := binding[bindingPortKey].(int64)
+		port := binding[bindingPortKey].(int)
 		ipAddress := binding[bindingAddressKey].(string)
 		hostname := binding[bindingHostKey].(string)
 
@@ -174,7 +173,7 @@ func hashBinding(v interface{}) int {
 	bindingMap := v.(map[string]interface{})
 	address := schema.HashString(bindingMap[bindingAddressKey].(string))
 	protocol := schema.HashString(bindingMap[bindingProtocolKey].(string))
-	port := schema.HashInt(bindingMap[bindingPortKey].(int64))
+	port := schema.HashInt(bindingMap[bindingPortKey].(int))
 	hostname := schema.HashString(bindingMap[bindingHostKey].(string))
 
 	return address + protocol + port + hostname
