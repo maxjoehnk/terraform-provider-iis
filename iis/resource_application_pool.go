@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/maxjoehnk/microsoft-iis-administration"
 )
 
 const NameKey = "name"
@@ -24,7 +25,7 @@ func resourceApplicationPool() *schema.Resource {
 			StatusKey: {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "started",
+				Default: "started",
 			},
 		},
 	}
