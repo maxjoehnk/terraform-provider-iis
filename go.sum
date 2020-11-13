@@ -237,6 +237,10 @@ github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNx
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201007080603-30daafe5102f h1:VkXJbWEnu5I+51zkFPOEXkaIgJYIShRW0O3l1i1Ojww=
 github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201007080603-30daafe5102f/go.mod h1:RvSyx6SPV+AkzVjVK08vD1VvJ4Hgas/o31yCOesK+hA=
+github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201113080704-34c54058f44a h1:7QfGYtMEvuZV4yRKANeKVHZlbSAgzUBVuDjFZKCZqtE=
+github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201113080704-34c54058f44a/go.mod h1:RvSyx6SPV+AkzVjVK08vD1VvJ4Hgas/o31yCOesK+hA=
+github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201113093929-54ddb6f5a56f h1:4qI2ThQ2PtiDkI9TusLC6i3DOATmccnpjiDgcLox9UI=
+github.com/maxjoehnk/microsoft-iis-administration v0.0.0-20201113093929-54ddb6f5a56f/go.mod h1:RvSyx6SPV+AkzVjVK08vD1VvJ4Hgas/o31yCOesK+hA=
 github.com/mitchellh/cli v1.1.1/go.mod h1:xcISNoH86gajksDmfB23e/pu+B+GeFRMYmoHXxx3xhI=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
