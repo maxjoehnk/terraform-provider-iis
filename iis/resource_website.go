@@ -75,16 +75,12 @@ var bindingSchema = &schema.Resource{
 func resourceWebsiteCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	request := createWebsiteRequest(d)
-	tflog.Debug(ctx, "Creating website", map[string]interface{}{
-		"request": request,
-	})
+	tflog.Debug(ctx, "Creating website: "+toJSON(request))
 	site, err := client.CreateWebsite(ctx, request)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Created website", map[string]interface{}{
-		"site": site,
-	})
+	tflog.Debug(ctx, "Created website: "+toJSON(site))
 	d.SetId(site.ID)
 	return nil
 }
@@ -96,9 +92,7 @@ func resourceWebsiteRead(ctx context.Context, d *schema.ResourceData, m interfac
 		d.SetId("")
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Read website", map[string]interface{}{
-		"site": site,
-	})
+	tflog.Debug(ctx, "Read website:"+toJSON(site))
 	if err = d.Set(nameKey, site.Name); err != nil {
 		return diag.FromErr(err)
 	}

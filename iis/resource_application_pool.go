@@ -35,16 +35,12 @@ func resourceApplicationPool() *schema.Resource {
 func resourceApplicationPoolCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	name := d.Get(NameKey).(string)
-	tflog.Debug(ctx, "Creating application pool", map[string]interface{}{
-		"name": name,
-	})
+	tflog.Debug(ctx, "Creating application pool: "+toJSON(name))
 	pool, err := client.CreateAppPool(ctx, name)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Created application pool", map[string]interface{}{
-		"pool": pool,
-	})
+	tflog.Debug(ctx, "Created application pool: "+toJSON(pool))
 	d.SetId(pool.ID)
 	return nil
 }
@@ -57,9 +53,7 @@ func resourceApplicationPoolRead(ctx context.Context, d *schema.ResourceData, m 
 		d.SetId("")
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Read application pool", map[string]interface{}{
-		"appPool": appPool,
-	})
+	tflog.Debug(ctx, "Read application pool: "+toJSON(appPool))
 
 	if err = d.Set(NameKey, appPool.Name); err != nil {
 		return diag.FromErr(err)
@@ -74,17 +68,12 @@ func resourceApplicationPoolUpdate(ctx context.Context, d *schema.ResourceData, 
 	client := m.(*iis.Client)
 	if d.HasChange(NameKey) {
 		name := d.Get(NameKey).(string)
-		tflog.Debug(ctx, "Updating application pool", map[string]interface{}{
-			"id":   d.Id(),
-			"name": name,
-		})
+		tflog.Debug(ctx, "Updating application pool: "+toJSON(name))
 		applicationPool, err := client.UpdateAppPool(ctx, d.Id(), name)
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		tflog.Debug(ctx, "Updated application pool", map[string]interface{}{
-			"applicationPool": applicationPool,
-		})
+		tflog.Debug(ctx, "Updated application pool: "+toJSON(applicationPool))
 		d.SetId(applicationPool.ID)
 	}
 	return nil
@@ -93,15 +82,11 @@ func resourceApplicationPoolUpdate(ctx context.Context, d *schema.ResourceData, 
 func resourceApplicationPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	id := d.Id()
-	tflog.Debug(ctx, "Deleting application pool", map[string]interface{}{
-		"id": id,
-	})
+	tflog.Debug(ctx, "Deleting application pool: "+toJSON(id))
 	err := client.DeleteAppPool(ctx, id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Deleted application pool", map[string]interface{}{
-		"id": id,
-	})
+	tflog.Debug(ctx, "Deleted application pool: "+toJSON(id))
 	return nil
 }

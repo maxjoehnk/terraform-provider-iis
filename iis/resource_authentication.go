@@ -88,9 +88,7 @@ func resourceAuthentication() *schema.Resource {
 func resourceAuthenticationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	application := d.Get("application").(string)
-	tflog.Debug(ctx, "Creating authentication", map[string]interface{}{
-		"application": application,
-	})
+	tflog.Debug(ctx, "Creating authentication: "+toJSON(application))
 	auth, err := client.ReadAuthenticationFromApplication(ctx, application)
 	if err != nil {
 		return diag.FromErr(err)
@@ -98,9 +96,7 @@ func resourceAuthenticationCreate(ctx context.Context, d *schema.ResourceData, m
 	if err := updateAuthProviders(ctx, d, client, auth); err != nil {
 		return err
 	}
-	tflog.Debug(ctx, "Created authentication", map[string]interface{}{
-		"auth": auth,
-	})
+	tflog.Debug(ctx, "Created authentication: "+toJSON(auth))
 	d.SetId(auth.ID)
 	return nil
 }
@@ -111,9 +107,7 @@ func resourceAuthenticationRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Read authentication", map[string]interface{}{
-		"auth": auth,
-	})
+	tflog.Debug(ctx, "Read authentication: "+toJSON(auth))
 	if err = readAuthenticationProvider(ctx, d, "anonymous", buildAnonymousAuthProvider(client, &auth)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -129,9 +123,7 @@ func resourceAuthenticationRead(ctx context.Context, d *schema.ResourceData, m i
 
 func resourceAuthenticationUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
-	tflog.Debug(ctx, "Updating authentication", map[string]interface{}{
-		"id": d.Id(),
-	})
+	tflog.Debug(ctx, "Updating authentication: "+toJSON(d.Id()))
 	auth, err := client.ReadAuthentication(ctx, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -158,9 +150,7 @@ func updateAuthProviders(ctx context.Context, d *schema.ResourceData, client *ii
 		return diag.FromErr(err)
 	}
 
-	tflog.Debug(ctx, "Updated authentication", map[string]interface{}{
-		"auth": auth,
-	})
+	tflog.Debug(ctx, "Updated authentication: "+toJSON(auth))
 
 	return nil
 }

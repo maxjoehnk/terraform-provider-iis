@@ -48,16 +48,12 @@ func resourceApplication() *schema.Resource {
 func resourceApplicationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	request := createApplicationRequest(d)
-	tflog.Debug(ctx, "Creating application", map[string]interface{}{
-		"request": request,
-	})
+	tflog.Debug(ctx, "Creating application: "+toJSON(request))
 	application, err := client.CreateApplication(ctx, request)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Created application", map[string]interface{}{
-		"application": application,
-	})
+	tflog.Debug(ctx, "Created application: "+toJSON(application))
 	d.SetId(application.ID)
 	return nil
 }
@@ -69,9 +65,7 @@ func resourceApplicationRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.SetId("")
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Read application", map[string]interface{}{
-		"application": application,
-	})
+	tflog.Debug(ctx, "Read application: "+toJSON(application))
 	if err = d.Set(WebsiteKey, application.Website.ID); err != nil {
 		return diag.FromErr(err)
 	}
@@ -91,16 +85,12 @@ func resourceApplicationUpdate(ctx context.Context, d *schema.ResourceData, m in
 func resourceApplicationDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	id := d.Id()
-	tflog.Debug(ctx, "Deleting application", map[string]interface{}{
-		"id": id,
-	})
+	tflog.Debug(ctx, "Deleting application: "+toJSON(id))
 	err := client.DeleteApplication(ctx, id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	tflog.Debug(ctx, "Deleted application", map[string]interface{}{
-		"id": id,
-	})
+	tflog.Debug(ctx, "Deleted application: "+toJSON(id))
 	return nil
 }
 
