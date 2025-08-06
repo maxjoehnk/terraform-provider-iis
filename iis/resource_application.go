@@ -2,6 +2,7 @@ package iis
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/maxjoehnk/microsoft-iis-administration"
@@ -47,10 +48,16 @@ func resourceApplication() *schema.Resource {
 func resourceApplicationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	request := createApplicationRequest(d)
+	tflog.Debug(ctx, "Creating application", map[string]interface{}{
+		"request": request,
+	})
 	application, err := client.CreateApplication(ctx, request)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tflog.Debug(ctx, "Created application", map[string]interface{}{
+		"application": application,
+	})
 	d.SetId(application.ID)
 	return nil
 }
@@ -62,6 +69,9 @@ func resourceApplicationRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.SetId("")
 		return diag.FromErr(err)
 	}
+	tflog.Debug(ctx, "Read application", map[string]interface{}{
+		"application": application,
+	})
 	if err = d.Set(WebsiteKey, application.Website.ID); err != nil {
 		return diag.FromErr(err)
 	}
@@ -81,10 +91,16 @@ func resourceApplicationUpdate(ctx context.Context, d *schema.ResourceData, m in
 func resourceApplicationDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
 	id := d.Id()
+	tflog.Debug(ctx, "Deleting application", map[string]interface{}{
+		"id": id,
+	})
 	err := client.DeleteApplication(ctx, id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tflog.Debug(ctx, "Deleted application", map[string]interface{}{
+		"id": id,
+	})
 	return nil
 }
 

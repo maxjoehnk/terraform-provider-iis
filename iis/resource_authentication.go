@@ -2,6 +2,7 @@ package iis
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/maxjoehnk/microsoft-iis-administration"
@@ -86,13 +87,20 @@ func resourceAuthentication() *schema.Resource {
 
 func resourceAuthenticationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
-	auth, err := client.ReadAuthenticationFromApplication(ctx, d.Get("application").(string))
+	application := d.Get("application").(string)
+	tflog.Debug(ctx, "Creating authentication", map[string]interface{}{
+		"application": application,
+	})
+	auth, err := client.ReadAuthenticationFromApplication(ctx, application)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if err := updateAuthProviders(ctx, d, client, auth); err != nil {
 		return err
 	}
+	tflog.Debug(ctx, "Created authentication", map[string]interface{}{
+		"auth": auth,
+	})
 	d.SetId(auth.ID)
 	return nil
 }
@@ -103,6 +111,9 @@ func resourceAuthenticationRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	tflog.Debug(ctx, "Read authentication", map[string]interface{}{
+		"auth": auth,
+	})
 	if err = readAuthenticationProvider(ctx, d, "anonymous", buildAnonymousAuthProvider(client, &auth)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -118,6 +129,9 @@ func resourceAuthenticationRead(ctx context.Context, d *schema.ResourceData, m i
 
 func resourceAuthenticationUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*iis.Client)
+	tflog.Debug(ctx, "Updating authentication", map[string]interface{}{
+		"id": d.Id(),
+	})
 	auth, err := client.ReadAuthentication(ctx, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
@@ -143,6 +157,11 @@ func updateAuthProviders(ctx context.Context, d *schema.ResourceData, client *ii
 	if err := updateAuthenticationProvider(ctx, d, client, "windows", windowsAuthProvider, updateWindowsAuthentication); err != nil {
 		return diag.FromErr(err)
 	}
+
+	tflog.Debug(ctx, "Updated authentication", map[string]interface{}{
+		"auth": auth,
+	})
+
 	return nil
 }
 
