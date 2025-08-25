@@ -1,13 +1,14 @@
-package iis
+package provider
 
 import (
 	"context"
+	"log"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/maxjoehnk/microsoft-iis-administration"
-	"log"
-	"strings"
+	"github.com/maxjoehnk/terraform-provider-iis/iis"
 )
 
 func resourceAuthentication() *schema.Resource {
